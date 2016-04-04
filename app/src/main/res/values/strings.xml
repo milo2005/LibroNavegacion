@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Navegacion</string>
+    <string name="add">Agregar</string>
+    <string name="more">Mas</string>
+    <string name="about">Acerca De</string>
+    <string name="help">Ayuda</string>
+    <string name="edit">Editar</string>
+    <string name="delete">Eliminar</string>
 </resources>
