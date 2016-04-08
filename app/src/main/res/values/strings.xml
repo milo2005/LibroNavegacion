@@ -6,4 +6,7 @@
     <string name="help">Ayuda</string>
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
+    <string name="nombre_del_libro">Nombre del Libro</string>
+    <string name="nombre_del_autor">Autor</string>
+    <string name="guardar">Guardar</string>
 </resources>

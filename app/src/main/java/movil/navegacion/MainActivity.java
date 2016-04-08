@@ -1,11 +1,15 @@
 package movil.navegacion;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -14,12 +18,14 @@ import java.util.List;
 
 import movil.navegacion.adapters.LibroAdapter;
 import movil.navegacion.models.Libro;
+import movil.navegacion.util.C;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogInterface.OnClickListener, AdapterView.OnItemClickListener {
 
     ListView list;
     LibroAdapter adapter;
-    List<Libro> data;
+
+    int pos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +33,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         list = (ListView) findViewById(R.id.list);
-        data =  new ArrayList<>();
-        adapter = new LibroAdapter(this, data);
+        C.data =  new ArrayList<>();
+        adapter = new LibroAdapter(this, C.data);
         list.setAdapter(adapter);
+        list.setOnItemClickListener(this);
 
         registerForContextMenu(list);
 
         loadLibros();
 
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        adapter.notifyDataSetChanged();
     }
 
     public void loadLibros(){
@@ -50,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
         l3.setNombre("Libro 3");
         l3.setAutor("Autor 3");
 
-        data.add(l1);
-        data.add(l2);
-        data.add(l3);
+        C.data.add(l1);
+        C.data.add(l2);
+        C.data.add(l3);
 
         adapter.notifyDataSetChanged();
     }
@@ -68,7 +81,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_add:
-                Toast.makeText(this,"Seleccionaste Agregar",Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(this
+                        , AddActivity.class);
+                startActivity(intent);
+
                 break;
             case R.id.action_about:
                 Toast.makeText(this,"Seleccionaste Acerca de",Toast.LENGTH_SHORT).show();
@@ -88,10 +105,43 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        pos = info.position;
+
+
         switch (item.getItemId()){
-            case R.id.action_delete: break;
+            case R.id.action_delete:
+                showAlerteDelete();
+                break;
             case R.id.action_edit: break;
         }
         return super.onContextItemSelected(item);
+    }
+
+    private void showAlerteDelete() {
+        AlertDialog alert = new AlertDialog.Builder(this)
+                .setTitle("Elinar")
+                .setMessage("Esta seguro de eleminar el libro")
+                .setPositiveButton("Aceptar",this)
+                .setNegativeButton("Cancelar", this)
+                .create();
+        alert.show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if(which == DialogInterface.BUTTON_POSITIVE){
+            C.data.remove(pos);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_POS, position);
+        startActivity(intent);
     }
 }
